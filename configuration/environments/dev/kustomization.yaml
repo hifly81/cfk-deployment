@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base/topics
+- ../../base/rolebindings
+patches:
+- target:
+    kind: Topic
+    name: test-topic
+  patch: |-
+    - op: replace
+      path: /spec/replicas
+      value: 1
+    - op: replace
+      path: /spec/partitions
+      value: 1
