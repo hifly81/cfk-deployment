@@ -1,9 +1,0 @@
-namePrefix: kustomize-
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-
-resources:
-- kraftcontroller.yaml
-- kafka.yaml
-- schemaregistry.yaml
-- controlcenter.yaml
