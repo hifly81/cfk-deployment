@@ -8,7 +8,7 @@ patches:
 - target:
     kind: Topic
     name: test-topic
-  patch: |-
-    - op: replace
-      path: /spec/replicas
-      value: 1
+  patch:
+  - op: replace
+    path: /spec/replicas
+    value: 1
