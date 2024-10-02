@@ -1,0 +1,57 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: KsqlDB
+metadata:
+  name: ksqldb
+  namespace: confluent
+spec:
+  replicas: 1
+  image:
+    application: confluentinc/cp-ksqldb-server:7.6.2
+    init: confluentinc/confluent-init-container:2.9.1
+  tls:
+    secretRef: tls-group
+  dataVolumeCapacity: 10Gi
+  internalTopicReplicationFactor: 1
+  authorization:
+    type: rbac
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka.confluent.svc.cluster.local:9071
+      authentication:
+        type: plain
+        jaasConfig:
+          secretRef: credential
+      tls:
+        enabled: true
+    mds:
+      endpoint: https://kafka.confluent.svc.cluster.local:8090
+      tokenKeyPair:
+        secretRef: mds-token
+      authentication:
+        type: bearer
+        bearer:
+          secretRef: ksqldb-mds-client
+      tls:
+        enabled: true
+    #schemaRegistry:
+    #  url: https://schemaregistry.confluent.svc.cluster.local:8081
+    #  tls:
+    #    enabled: true
+    connect:
+      url: https://connect.confluent.svc.cluster.local:8083
+      tls:
+        enabled: true
+  podTemplate:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 500Mi
+    probe:
+      liveness:
+        periodSeconds: 10
+        failureThreshold: 5
+        timeoutSeconds: 500 
+    podSecurityContext:
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsNonRoot: true
