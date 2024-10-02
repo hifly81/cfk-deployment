@@ -5,9 +5,9 @@ resources:
 - ../../base
 patches:
 - target:
-  kind: Kafka
-  name: kafka
-  patch: |-
-    - op: replace
-      path: /spec/replicas
-      value: 1
+    kind: Kafka
+    name: kafka
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
