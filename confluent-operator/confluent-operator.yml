@@ -12,6 +12,9 @@ spec:
     repoURL: https://packages.confluent.io/helm
     targetRevision: 0.1033.33
     chart: confluent-for-kubernetes
+    helm:
+      valuesObject:
+        kraftEnabled: true
   sources: []
   project: default
   syncPolicy:
