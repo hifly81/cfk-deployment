@@ -6,7 +6,7 @@ resources:
 - ../../base/rolebindings
 patches:
 - target:
-    kind: Topic
+    kind: KafkaTopic
     name: test-topic
   patch: |-
     - op: replace
