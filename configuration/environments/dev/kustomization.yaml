@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
 - ../../base/topics
 - ../../base/rolebindings
+- ../../base/schemas
 patches:
 - target:
     kind: KafkaTopic
