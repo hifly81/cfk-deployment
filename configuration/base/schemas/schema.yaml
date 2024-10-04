@@ -7,7 +7,7 @@ spec:
   data:
     configRef: schema-config
     format: avro
-    compatibilityLevel: FORWARD
+  compatibilityLevel: FORWARD
   schemaRegistryRest:
     authentication:
       type: basic
