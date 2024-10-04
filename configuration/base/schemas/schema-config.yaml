@@ -13,6 +13,6 @@ data:
         {"name": "id", "type": "string"},
         {"name": "amount", "type": "double"},
         {"name": "email", "type": "string"},
-        {"name": "age", "type": "integer"}
+        {"name": "age", "type": "int"}
       ]
     }
