@@ -3,3 +3,5 @@ kind: Kustomization
 
 resources:
 - app1-rb.yaml
+- app2-rb.yaml
+- kafka-sr.yaml

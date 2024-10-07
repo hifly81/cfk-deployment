@@ -1,0 +1,16 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: app2-read-rb
+spec:
+  principal:
+    name: app2
+    type: user
+  resourcePatterns:
+  - name: "app2"
+    patternType: PREFIXED
+    resourceType: Topic
+  - name: "app2"
+    patternType: PREFIXED
+    resourceType: Group
+  role: DeveloperRead
