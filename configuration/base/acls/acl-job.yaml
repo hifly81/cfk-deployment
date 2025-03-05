@@ -33,6 +33,9 @@ spec:
             - name: kafka-admin-config
               mountPath: /tmp/admin.properties
               subPath: admin.properties
+            - name: kafka-truststore-secret
+              mountPath: /vault/secrets/truststore.jks
+              subPath: truststore.jks
       volumes:
         - name: kafka-acl-script
           configMap:
@@ -44,3 +47,6 @@ spec:
         - name: kafka-admin-config
           secret:
             secretName: kafka-admin-secret
+        - name: kafka-truststore-secret
+          secret:
+            secretName: kafka-truststore-secret
