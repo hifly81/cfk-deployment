@@ -29,6 +29,7 @@ spec:
     schemaRegistry:
       url: https://schemaregistry.confluent.svc.cluster.local:8081
       tls:
+        enabled: true
         secretRef: kafka-tls
         jksPassword:
           secretRef: kafka-credential-tls
