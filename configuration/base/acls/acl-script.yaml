@@ -21,26 +21,31 @@ data:
           if [[ -n "$NAME" ]]; then
             # Apply ACL for the previous block
             echo "Processing ACL: $NAME"
-            for topic in "${TOPICS[@]}"; do
-              CMD="kafka-acls --bootstrap-server $BROKER --command-config /tmp/admin.properties $ACTION --allow-principal $ALLOW_PRINCIPAL"
-    
-              # Add operations
-              for op in "${OPERATIONS[@]}"; do
-                CMD+=" --operation $op"
+            if [[ ${#TOPICS[@]} -gt 0 && ${#OPERATIONS[@]} -gt 0 ]]; then
+              # Loop through topics and apply ACL commands
+              for topic in "${TOPICS[@]}"; do
+                CMD="kafka-acls --bootstrap-server $BROKER --command-config /tmp/admin.properties $ACTION --allow-principal $ALLOW_PRINCIPAL"
+
+                # Add operations
+                for op in "${OPERATIONS[@]}"; do
+                  CMD+=" --operation $op"
+                done
+
+                # Add topic and resource pattern type
+                CMD+=" --topic $topic"
+                CMD+=" --resource-pattern-type $RESOURCE_PATTERN_TYPE"
+
+                # Add transactional ID if present
+                if [[ -n "$TRANSACTIONAL_ID" ]]; then
+                  CMD+=" --transactional-id $TRANSACTIONAL_ID"
+                fi
+
+                echo "Executing: $CMD"
+                eval "$CMD"  # Execute the command
               done
-    
-              # Add topic and resource pattern type
-              CMD+=" --topic $topic"
-              CMD+=" --resource-pattern-type $RESOURCE_PATTERN_TYPE"
-    
-              # Add transactional ID if present
-              if [[ -n "$TRANSACTIONAL_ID" ]]; then
-                CMD+=" --transactional-id $TRANSACTIONAL_ID"
-              fi
-    
-              echo "Executing: $CMD"
-              eval "$CMD"  # Execute the command
-            done
+            else
+              echo "Error: No valid operations or topics found for ACL: $NAME"
+            fi
           fi
           # Reset variables for new block
           NAME=$(echo "$line" | sed -E 's/.*name: *//')
@@ -88,21 +93,26 @@ data:
     # Process the last ACL block after finishing the loop (this part is crucial for a single ACL)
     if [[ -n "$NAME" ]]; then
       echo "Processing final ACL: $NAME"
-      for topic in "${TOPICS[@]}"; do
-        CMD="kafka-acls --bootstrap-server $BROKER --command-config /tmp/admin.properties $ACTION --allow-principal $ALLOW_PRINCIPAL"
+      if [[ ${#TOPICS[@]} -gt 0 && ${#OPERATIONS[@]} -gt 0 ]]; then
+        for topic in "${TOPICS[@]}"; do
+          CMD="kafka-acls --bootstrap-server $BROKER --command-config /tmp/admin.properties $ACTION --allow-principal $ALLOW_PRINCIPAL"
 
-        for op in "${OPERATIONS[@]}"; do
-          CMD+=" --operation $op"
+          # Add operations
+          for op in "${OPERATIONS[@]}"; do
+            CMD+=" --operation $op"
+          done
+
+          CMD+=" --topic $topic"
+          CMD+=" --resource-pattern-type $RESOURCE_PATTERN_TYPE"
+
+          if [[ -n "$TRANSACTIONAL_ID" ]]; then
+            CMD+=" --transactional-id $TRANSACTIONAL_ID"
+          fi
+
+          echo "Executing: $CMD"
+          eval "$CMD"  # Execute the command
         done
-
-        CMD+=" --topic $topic"
-        CMD+=" --resource-pattern-type $RESOURCE_PATTERN_TYPE"
-
-        if [[ -n "$TRANSACTIONAL_ID" ]]; then
-          CMD+=" --transactional-id $TRANSACTIONAL_ID"
-        fi
-
-        echo "Executing: $CMD"
-        eval "$CMD"  # Execute the command
-      done
+      else
+        echo "Error: No valid operations or topics found for final ACL: $NAME"
+      fi
     fi
