@@ -8,7 +8,7 @@ metadata:
 data:
   acl-config.yaml: |
     acls:
-      - name: "Team1 Access"
+      - name: "Team1 Access2"
         action: --add
         allow_principal: User:alice
         operations:
