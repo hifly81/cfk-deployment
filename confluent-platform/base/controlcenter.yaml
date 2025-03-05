@@ -1,0 +1,54 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: ControlCenter
+metadata:
+  name: controlcenter
+  namespace: confluent
+spec:
+  license:
+    secretRef: confluent-license
+  replicas: 1
+  podTemplate:
+    probe:
+      liveness:
+        periodSeconds: 10
+        failureThreshold: 5
+        timeoutSeconds: 500
+  image:
+    application: confluentinc/cp-enterprise-control-center:7.7.2
+    init: confluentinc/confluent-init-container:2.9.4
+  dataVolumeCapacity: 1Gi
+  tls:
+    secretRef: kafka-tls
+    jksPassword:
+      secretRef: kafka-credential-tls
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka.confluent.svc.cluster.local:9071
+      authentication:
+        type: plain
+        jaasConfig:
+          secretRef: credential-jaas
+      tls:
+        secretRef: kafka-tls
+        jksPassword:
+          secretRef: kafka-credential-tls
+    connect:
+      - name: connect
+        url:  https://connect.confluent.svc.cluster.local:8083
+        tls:
+          secretRef: kafka-tls
+          jksPassword:
+            secretRef: kafka-credential-tls
+    ksqldb:
+      - name: ksqldb
+        url:  https://ksqldb.confluent.svc.cluster.local:8088
+        tls:
+          secretRef: kafka-tls
+          jksPassword:
+            secretRef: kafka-credential-tls
+    schemaRegistry:
+      url: https://schemaregistry.confluent.svc.cluster.local:8081
+      tls:
+        secretRef: kafka-tls
+        jksPassword:
+          secretRef: kafka-credential-tls

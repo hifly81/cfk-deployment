@@ -1,0 +1,34 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: KsqlDB
+metadata:
+  name: ksqldb
+  namespace: confluent
+spec:
+  license:
+    secretRef: confluent-license
+  replicas: 1
+  image:
+    application: confluentinc/cp-ksqldb-server:7.7.2
+    init: confluentinc/confluent-init-container:2.9.4
+  dataVolumeCapacity: 1Gi
+  tls:
+    secretRef: kafka-tls
+    jksPassword:
+      secretRef: kafka-credential-tls
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka.confluent.svc.cluster.local:9071
+      authentication:
+        type: plain
+        jaasConfig:
+          secretRef: credential-jaas
+      tls:
+        secretRef: kafka-tls
+        jksPassword:
+          secretRef: kafka-credential-tls
+    schemaRegistry:
+      url: https://schemaregistry.confluent.svc.cluster.local:8081
+      tls:
+        secretRef: kafka-tls
+        jksPassword:
+          secretRef: kafka-credential-tls

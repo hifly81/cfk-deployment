@@ -9,3 +9,7 @@ resources:
 - kraftcontroller.yaml
 - kafka.yaml
 - schemaregistry.yaml
+- connect.yaml
+- restproxy.yaml
+- ksqldb.yaml
+- controlcenter.yaml

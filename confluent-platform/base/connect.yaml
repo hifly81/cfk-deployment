@@ -1,0 +1,27 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: SchemaRegistry
+metadata:
+  name: connect
+  namespace: confluent
+spec:
+  license:
+    secretRef: confluent-license
+  replicas: 1
+  image:
+    application: confluentinc/cp-server-connect:7.7.2
+    init: confluentinc/confluent-init-container:2.9.4
+  tls:
+    secretRef: kafka-tls
+    jksPassword:
+      secretRef: kafka-credential-tls
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka.confluent.svc.cluster.local:9071
+      authentication:
+        type: plain
+        jaasConfig:
+          secretRef: credential-jaas
+      tls:
+        secretRef: kafka-tls
+        jksPassword:
+          secretRef: kafka-credential-tls
