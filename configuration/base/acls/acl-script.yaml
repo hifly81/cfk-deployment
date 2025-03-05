@@ -14,53 +14,93 @@ data:
 
     echo "Using Kafka Broker: $BROKER"
 
-    # Parse and process each ACL block
-    awk '/acls:/ {flag=1; next} /^[^ ]/ {flag=0} flag' "$ACL_FILE" | \
-      awk '/^- / {if (NR > 1) print ""; print; next} {print}' | while IFS= read -r acl; do
-
-        # Extract key-value pairs without quotes
-        NAME=$(echo "$acl" | grep 'name:' | sed -E 's/^[[:space:]]*name:[[:space:]]*//')
-        ACTION=$(echo "$acl" | grep 'action:' | sed -E 's/^[[:space:]]*action:[[:space:]]*//')
-        ALLOW_PRINCIPAL=$(echo "$acl" | grep 'allow_principal:' | sed -E 's/^[[:space:]]*allow_principal:[[:space:]]*//')
-        TRANSACTIONAL_ID=$(echo "$acl" | grep 'transactional_id:' | sed -E 's/^[[:space:]]*transactional_id:[[:space:]]*//' || true)
-        RESOURCE_PATTERN_TYPE=$(echo "$acl" | grep 'resource_pattern_type:' | sed -E 's/^[[:space:]]*resource_pattern_type:[[:space:]]*//')
-
-        # Parse operations (removes leading "- ")
-        OPERATIONS=()
-        while IFS= read -r op; do
-          op=$(echo "$op" | sed -E 's/^[[:space:]]*-[[:space:]]*//' | xargs) # Clean operation
-          [[ -n "$op" ]] && OPERATIONS+=("$op")
-        done < <(echo "$acl" | awk '/operations:/ {flag=1; next} /^[^ ]/ {flag=0} flag')
-
-        # Parse topics (removes leading "- " and handles unquoted values)
-        TOPICS=()
-        while IFS= read -r topic; do
-          topic=$(echo "$topic" | sed -E 's/^[[:space:]]*-[[:space:]]*//' | xargs) # Clean topic
-          [[ -n "$topic" ]] && TOPICS+=("$topic")
-        done < <(echo "$acl" | awk '/topics:/ {flag=1; next} /^[^ ]/ {flag=0} flag')
-
-        echo "Processing ACL: $NAME"
-
-        # Apply ACL for each topic
-        for topic in "${TOPICS[@]}"; do
-            # Construct Kafka ACL command
-            CMD="kafka-acls --bootstrap-server $BROKER --command-config /tmp/admin.properties $ACTION --allow-principal $ALLOW_PRINCIPAL"
-
-            # Add operations
-            for op in "${OPERATIONS[@]}"; do
+    # Parse YAML and process each ACL block
+    while IFS= read -r line; do
+      case "$line" in
+        "  - name:"*)
+          if [[ -n "$NAME" ]]; then
+            # Apply ACL for previous block
+            for topic in "${TOPICS[@]}"; do
+              CMD="kafka-acls --bootstrap-server $BROKER --command-config /tmp/admin.properties $ACTION --allow-principal $ALLOW_PRINCIPAL"
+    
+              # Add operations
+              for op in "${OPERATIONS[@]}"; do
                 CMD+=" --operation $op"
-            done
+              done
 
-            # Add topic and resource pattern type
-            CMD+=" --topic $topic"
-            CMD+=" --resource-pattern-type $RESOURCE_PATTERN_TYPE"
+              # Add topic and resource pattern type
+              CMD+=" --topic $topic"
+              CMD+=" --resource-pattern-type $RESOURCE_PATTERN_TYPE"
 
-            # Add transactional ID if present
-            if [[ -n "$TRANSACTIONAL_ID" ]]; then
+              # Add transactional ID if present
+              if [[ -n "$TRANSACTIONAL_ID" ]]; then
                 CMD+=" --transactional-id $TRANSACTIONAL_ID"
-            fi
+              fi
 
-            echo "Executing: $CMD"
-            eval "$CMD"
+              echo "Executing: $CMD"
+              eval "$CMD"
+            done
+          fi
+          # Reset variables for new block
+          NAME=$(echo "$line" | sed -E 's/.*name: *//')
+          ACTION=""
+          ALLOW_PRINCIPAL=""
+          TRANSACTIONAL_ID=""
+          RESOURCE_PATTERN_TYPE=""
+          OPERATIONS=()
+          TOPICS=()
+          ;;
+        "    action:"*)
+          ACTION=$(echo "$line" | sed -E 's/.*action: *//')
+          ;;
+        "    allow_principal:"*)
+          ALLOW_PRINCIPAL=$(echo "$line" | sed -E 's/.*allow_principal: *//')
+          ;;
+        "    transactional_id:"*)
+          TRANSACTIONAL_ID=$(echo "$line" | sed -E 's/.*transactional_id: *//')
+          ;;
+        "    resource_pattern_type:"*)
+          RESOURCE_PATTERN_TYPE=$(echo "$line" | sed -E 's/.*resource_pattern_type: *//')
+          ;;
+        "      - "*)
+          item=$(echo "$line" | sed -E 's/.*- *//')
+          if [[ -n "$lastKey" ]]; then
+            case "$lastKey" in
+              "operations")
+                OPERATIONS+=("$item")
+                ;;
+              "topics")
+                TOPICS+=("$item")
+                ;;
+            esac
+          fi
+          ;;
+        "    operations:"*)
+          lastKey="operations"
+          ;;
+        "    topics:"*)
+          lastKey="topics"
+          ;;
+      esac
+    done < "$ACL_FILE"
+
+    # Process the last ACL block
+    if [[ -n "$NAME" ]]; then
+      for topic in "${TOPICS[@]}"; do
+        CMD="/opt/kafka/bin/kafka-acls.sh --bootstrap-server $BROKER --command-config /tmp/admin.properties $ACTION --allow-principal $ALLOW_PRINCIPAL"
+
+        for op in "${OPERATIONS[@]}"; do
+          CMD+=" --operation $op"
         done
-    done
+
+        CMD+=" --topic $topic"
+        CMD+=" --resource-pattern-type $RESOURCE_PATTERN_TYPE"
+
+        if [[ -n "$TRANSACTIONAL_ID" ]]; then
+          CMD+=" --transactional-id $TRANSACTIONAL_ID"
+        fi
+
+        echo "Executing: $CMD"
+        eval "$CMD"
+      done
+    fi
