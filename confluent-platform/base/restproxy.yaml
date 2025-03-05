@@ -22,6 +22,7 @@ spec:
         jaasConfig:
           secretRef: credential-jaas
       tls:
+        enabled: true
         secretRef: kafka-tls
         jksPassword:
           secretRef: kafka-credential-tls
