@@ -6,4 +6,4 @@ metadata:
   labels:
     app: kafka-acl
 data:
-  broker-address: "kafka.confluent.svc.cluster.local:9092"
+  broker-address: "kafka.confluent.svc.cluster.local:9071"
