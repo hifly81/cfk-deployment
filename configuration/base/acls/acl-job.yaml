@@ -34,7 +34,7 @@ spec:
               mountPath: /tmp/admin.properties
               subPath: admin.properties
             - name: kafka-truststore-secret
-              mountPath: /vault/secrets/truststore.jks
+              mountPath: /mnt/sslcerts/truststore.jks
               subPath: truststore.jks
       volumes:
         - name: kafka-acl-script
