@@ -34,11 +34,11 @@ spec:
               mountPath: /tmp/admin.properties
               subPath: admin.properties
       volumes:
-        - name: acl-script
+        - name: kafka-acl-script
           configMap:
             name: kafka-acl-script
             defaultMode: 0755
-        - name: acl-config
+        - name: kafka-acl-config
           configMap:
             name: kafka-acl-config
         - name: kafka-admin-config
