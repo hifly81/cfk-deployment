@@ -35,7 +35,7 @@ spec:
     superUsers:
       - User:kafka
       - User:kraft
-      - User:operator
+      - User:kraftcontroller
   tls:
     secretRef: kafka-tls
     jksPassword:
