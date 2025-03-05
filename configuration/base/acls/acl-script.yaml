@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-acl-script
+  namespace: confluent
+  labels:
+    app: kafka-acl
+data:
+  acl-setup.sh: |
+    #!/bin/bash
+
+    ACL_FILE=/tmp/acl-config.yaml
+    BROKER="${KAFKA_BROKER:-broker:9092}"
+
+    echo "Using Kafka Broker: $BROKER"
+
+    # Parse and process each ACL block
+    awk '/acls:/ {flag=1; next} /^[^ ]/ {flag=0} flag' "$ACL_FILE" | \
+      awk '/^- / {if (NR > 1) print ""; print; next} {print}' | while IFS= read -r acl; do
+        NAME=$(echo "$acl" | grep 'name:' | sed 's/.*: //')
+        ACTION=$(echo "$acl" | grep 'action:' | sed 's/.*: //')
+        ALLOW_PRINCIPAL=$(echo "$acl" | grep 'allow_principal:' | sed 's/.*: //')
+        TRANSACTIONAL_ID=$(echo "$acl" | grep 'transactional_id:' | sed 's/.*: //' || true)
+        RESOURCE_PATTERN_TYPE=$(echo "$acl" | grep 'resource_pattern_type:' | sed 's/.*: //')
+
+        OPERATIONS=()
+        while IFS= read -r op; do
+          op=$(echo "$op" | sed -E 's/^\s*-\s*//' | xargs)
+          [[ -n "$op" ]] && OPERATIONS+=("$op")
+        done < <(echo "$acl" | awk '/operations:/ {flag=1; next} /^[^ ]/ {flag=0} flag')
+
+        TOPICS=()
+        while IFS= read -r topic; do
+          topic=$(echo "$topic" | sed -E 's/^\s*-\s*//' | xargs)
+          [[ -n "$topic" ]] && TOPICS+=("$topic")
+        done < <(echo "$acl" | awk '/topics:/ {flag=1; next} /^[^ ]/ {flag=0} flag')
+
+        echo "Processing ACL: $NAME"
+
+        for topic in "${TOPICS[@]}"; do
+            CMD="kafka-acls --bootstrap-server $BROKER --command-config /tmp/admin.properties $ACTION --allow-principal \"$ALLOW_PRINCIPAL\""
+            for op in "${OPERATIONS[@]}"; do
+                CMD+=" --operation $op"
+            done
+            CMD+=" --topic $topic"
+            CMD+=" --resource-pattern-type $RESOURCE_PATTERN_TYPE"
+            if [[ -n "$TRANSACTIONAL_ID" ]]; then
+                CMD+=" --transactional-id $TRANSACTIONAL_ID"
+            fi
+
+            echo "Executing: $CMD"
+            eval "$CMD"
+        done
+    done
