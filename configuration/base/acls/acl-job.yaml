@@ -15,8 +15,8 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
-              chmod +x /scripts/acl-setup.sh
-              /scripts/acl-setup.sh
+              chmod +x /tmp/acl-setup.sh
+              /tmp/acl-setup.sh
           env:
             - name: KAFKA_BROKER
               valueFrom:
@@ -25,7 +25,7 @@ spec:
                   key: broker-address
           volumeMounts:
             - name: acl-script
-              mountPath: /scripts
+              mountPath: /tmp/acl-setup.sh
             - name: acl-config
               mountPath: /tmp/acl-config.yaml
               subPath: acl-config.yaml
