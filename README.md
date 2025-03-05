@@ -1,3 +1,6 @@
+Confluent For Kubernetes deployment with ArgoCD. 
+Easily install and sync Confluent Platform components (kraft, kafka, schema registry, connect, ksql, control center) and resources (topics, acls, rbac, schemas, connector)
+
 ## Quickstart
 
 ### Requirements 
