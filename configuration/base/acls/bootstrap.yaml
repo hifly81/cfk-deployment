@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: kafka-config
-  namespace: kafka
+  namespace: confluent
   labels:
     app: kafka-acl
 data:
