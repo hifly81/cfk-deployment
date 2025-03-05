@@ -14,7 +14,6 @@ data:
         operations:
           - WRITE
           - READ
-        transactional_id: team1-streams-app1
         resource_pattern_type: literal
         topics:
           - team1-topic1
