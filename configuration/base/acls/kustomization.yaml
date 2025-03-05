@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
 - bootstrap.yaml
 - acl-config.yaml
+- acl-script.yaml
