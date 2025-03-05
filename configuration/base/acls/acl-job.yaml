@@ -24,10 +24,10 @@ spec:
                   name: kafka-config
                   key: broker-address
           volumeMounts:
-            - name: kafka-acl-script
+            - name: acl-script
               mountPath: /tmp/acl-setup.sh
               subPath: acl-setup.sh
-            - name: kafka-acl-config
+            - name: acl-config
               mountPath: /tmp/acl-config.yaml
               subPath: acl-config.yaml
             - name: kafka-admin-config
