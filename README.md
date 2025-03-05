@@ -109,7 +109,7 @@ Deploy cp-platform-app on _confluent_ namespace for _dev_ environment:
 
 ```
 argocd app create cp-platform-app \
---repo https://github.com/ncapelle/cfk-deployment.git \
+--repo https://github.com/hifly81/cfk-deployment \
 --path confluent-platform/environments/dev \
 --dest-server https://kubernetes.default.svc \
 --dest-namespace confluent \
@@ -134,7 +134,7 @@ Apply configuration-app on _confluent_ namespace for _dev_ environment:
 
 ```
 $ argocd app create configuration-app \
---repo https://github.com/ncapelle/cfk-deployment.git \
+--repo https://github.com/hifly81/cfk-deployment \
 --path configuration/environments/dev \
 --dest-server https://kubernetes.default.svc \
 --dest-namespace confluent \
