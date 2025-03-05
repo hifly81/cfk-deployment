@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-acl-job
+  namespace: confluent
+  labels:
+    app: kafka-acl
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: kafka-acl
+          image: confluentinc/cp-kafka:latest
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              chmod +x /scripts/acl-setup.sh
+              /scripts/acl-setup.sh
+          env:
+            - name: KAFKA_BROKER
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-config
+                  key: broker-address
+          volumeMounts:
+            - name: acl-script
+              mountPath: /scripts
+            - name: acl-config
+              mountPath: /tmp/acl-config.yaml
+              subPath: acl-config.yaml
+            - name: kafka-admin-config
+              mountPath: /tmp/admin.properties
+              subPath: admin.properties
+      volumes:
+        - name: acl-script
+          configMap:
+            name: kafka-acl-script
+            defaultMode: 0755
+        - name: acl-config
+          configMap:
+            name: kafka-acl-config
+        - name: kafka-admin-config
+          secret:
+            secretName: kafka-admin-secret
