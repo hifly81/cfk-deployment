@@ -8,8 +8,8 @@ spec:
     secretRef: confluent-license
   replicas: 1
   image:
-    application: confluentinc/cp-ksqldb-server:7.7.2
-    init: confluentinc/confluent-init-container:2.9.4
+    application: confluentinc/cp-ksqldb-server:7.9.0
+    init: confluentinc/confluent-init-container:2.11.0
   dataVolumeCapacity: 1Gi
   tls:
     secretRef: kafka-tls

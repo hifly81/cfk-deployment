@@ -8,8 +8,8 @@ spec:
     secretRef: confluent-license
   replicas: 1
   image:
-    application: confluentinc/cp-kafka-rest:7.7.2
-    init: confluentinc/confluent-init-container:2.9.4
+    application: confluentinc/cp-kafka-rest:7.9.0
+    init: confluentinc/confluent-init-container:2.11.0
   tls:
     secretRef: kafka-tls
     jksPassword:
