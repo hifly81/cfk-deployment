@@ -31,7 +31,6 @@ spec:
           secretRef: credential-jaas
   configOverrides:
     server:
-      - confluent.http.server.listeners=http://0.0.0.0:8090
       - auto.create.topics.enable=true
       - default.replication.factor=3
       - min.insync.replicas=2
