@@ -31,6 +31,7 @@ spec:
           secretRef: credential-jaas
   configOverrides:
     server:
+      - kafka.rest.enable=true
       - auto.create.topics.enable=true
       - default.replication.factor=3
       - min.insync.replicas=2
