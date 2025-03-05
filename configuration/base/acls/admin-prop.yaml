@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kafka-admin-secret
+  namespace: confluent
+  labels:
+    app: kafka-acl
+type: Opaque
+data:
+  admin.properties: |
+    c2VjdXJpdHkucHJvdG9jb2w9U0FTTF9TU0wKc2FzbC5tZWNoYW5pc209UExBSU4Kc2FzbC5qYWFzLmNvbmZpZz1vcmcuYXBhY2hlLmthZmthLmNvbW1vbi5zZWN1cml0eS5wbGFpbi5QbGFpbkxvZ2luTW9kdWxlIHJlcXVpcmVkIHVzZXJuYW1lPSJhZG1pbiIgcGFzc3dvcmQ9InlvdXJfcGFzc3dvcmQiOw==

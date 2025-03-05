@@ -5,3 +5,4 @@ resources:
 - bootstrap.yaml
 - acl-config.yaml
 - acl-script.yaml
+- admin-prop.yaml
