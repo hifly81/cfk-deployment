@@ -19,6 +19,32 @@ spec:
   image:
     application: docker.io/confluentinc/cp-server:7.7.2
     init: confluentinc/confluent-init-container:2.9.4
+  listeners:
+    internal:
+      tls:
+        enabled: true
+      authentication:
+        type: plain
+        jaasConfigPassThrough:
+          secretRef: credential
+  configOverrides:
+    server:
+      - password.encoder.secret=secret1
+      - auto.create.topics.enable=true
+      - default.replication.factor=3
+      - min.insync.replicas=2
+      - num.partitions=3
+      - log.retention.hours=48
+      - authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+    log4j:
+      - log4j.logger.kafka.server.link=INFO, stdout
+      - log4j.additivity.kafka.server.link=false
+    authorization:
+      type: simple
+      superUsers:
+        - User:kafka
+        - User:controlcenter
+        - User:kraft
   tls:
     secretRef: kafka-tls
     jksPassword:
