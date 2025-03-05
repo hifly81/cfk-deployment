@@ -6,113 +6,85 @@ metadata:
   labels:
     app: kafka-acl
 data:
-  acl-setup.sh: |
-    #!/bin/bash
-
-    ACL_FILE=/tmp/acl-config.yaml
-    BROKER="${KAFKA_BROKER:-broker:9092}"
-
-    echo "Using Kafka Broker: $BROKER"
-
-    # Parse YAML and process each ACL block
-    while IFS= read -r line; do
-      case "$line" in
-        "  - name:"*)  # Detect ACL block start
-          if [[ -n "$NAME" ]]; then
-            # Apply ACL for the previous block
-            echo "Processing ACL: $NAME"
-            if [[ ${#TOPICS[@]} -gt 0 && ${#OPERATIONS[@]} -gt 0 ]]; then
-              # Loop through topics and apply ACL commands
-              for topic in "${TOPICS[@]}"; do
-                CMD="kafka-acls --bootstrap-server $BROKER --command-config /tmp/admin.properties $ACTION --allow-principal $ALLOW_PRINCIPAL"
-
-                # Add operations
-                for op in "${OPERATIONS[@]}"; do
-                  CMD+=" --operation $op"
-                done
-
-                # Add topic and resource pattern type
-                CMD+=" --topic $topic"
-                CMD+=" --resource-pattern-type $RESOURCE_PATTERN_TYPE"
-
-                # Add transactional ID if present
-                if [[ -n "$TRANSACTIONAL_ID" ]]; then
-                  CMD+=" --transactional-id $TRANSACTIONAL_ID"
-                fi
-
-                echo "Executing: $CMD"
-                eval "$CMD"  # Execute the command
-              done
-            else
-              echo "Error: No valid operations or topics found for ACL: $NAME"
-            fi
-          fi
-          # Reset variables for new block
-          NAME=$(echo "$line" | sed -E 's/.*name: *//')
-          ACTION=""
-          ALLOW_PRINCIPAL=""
-          TRANSACTIONAL_ID=""
-          RESOURCE_PATTERN_TYPE=""
-          OPERATIONS=()
-          TOPICS=()
-          ;;
-        "    action:"*)  # Extract action
-          ACTION=$(echo "$line" | sed -E 's/.*action: *//')
-          ;;
-        "    allow_principal:"*)  # Extract allow_principal
-          ALLOW_PRINCIPAL=$(echo "$line" | sed -E 's/.*allow_principal: *//')
-          ;;
-        "    transactional_id:"*)  # Extract transactional_id
-          TRANSACTIONAL_ID=$(echo "$line" | sed -E 's/.*transactional_id: *//')
-          ;;
-        "    resource_pattern_type:"*)  # Extract resource_pattern_type
-          RESOURCE_PATTERN_TYPE=$(echo "$line" | sed -E 's/.*resource_pattern_type: *//')
-          ;;
-        "      - "*)
-          item=$(echo "$line" | sed -E 's/.*- *//')
-          if [[ -n "$lastKey" ]]; then
-            case "$lastKey" in
-              "operations")
-                OPERATIONS+=("$item")
-                ;;
-              "topics")
-                TOPICS+=("$item")
-                ;;
-            esac
-          fi
-          ;;
-        "    operations:"*)  # Operations block start
-          lastKey="operations"
-          ;;
-        "    topics:"*)  # Topics block start
-          lastKey="topics"
-          ;;
-      esac
-    done < "$ACL_FILE"
-
-    # Process the last ACL block after finishing the loop (this part is crucial for a single ACL)
-    if [[ -n "$NAME" ]]; then
-      echo "Processing final ACL: $NAME"
-      if [[ ${#TOPICS[@]} -gt 0 && ${#OPERATIONS[@]} -gt 0 ]]; then
-        for topic in "${TOPICS[@]}"; do
-          CMD="kafka-acls --bootstrap-server $BROKER --command-config /tmp/admin.properties $ACTION --allow-principal $ALLOW_PRINCIPAL"
-
-          # Add operations
-          for op in "${OPERATIONS[@]}"; do
-            CMD+=" --operation $op"
-          done
-
-          CMD+=" --topic $topic"
-          CMD+=" --resource-pattern-type $RESOURCE_PATTERN_TYPE"
-
-          if [[ -n "$TRANSACTIONAL_ID" ]]; then
-            CMD+=" --transactional-id $TRANSACTIONAL_ID"
-          fi
-
-          echo "Executing: $CMD"
-          eval "$CMD"  # Execute the command
-        done
-      else
-        echo "Error: No valid operations or topics found for final ACL: $NAME"
-      fi
-    fi
+  acl-script.py: |
+    #!/usr/bin/env python3
+    import yaml
+    import subprocess
+    import os
+    import re
+    
+    # Get Kafka broker from environment variable or default
+    KAFKA_BROKER = os.getenv("KAFKA_BROKER", "kafka.confluent.svc.cluster.local:9092")
+    if not KAFKA_BROKER:
+        print("Error: KAFKA_BROKER environment variable is not set.")
+        exit(1)
+    print(f"Using Kafka broker: {KAFKA_BROKER}")
+    
+    # Path to the YAML file containing the ACL configuration
+    CONFIG_FILE = "/tmp/acl-config.yaml"
+    
+    if not os.path.isfile(CONFIG_FILE):
+        print(f"Error: Configuration file {CONFIG_FILE} not found.")
+        exit(1)
+    
+    # Load YAML file
+    with open(CONFIG_FILE, "r") as file:
+        config = yaml.safe_load(file)
+    
+    # Fetch existing ACLs
+    check_cmd = [
+        "kafka-acls", "--command-config", "/tmp/admin.properties", "--bootstrap-server", KAFKA_BROKER, "--list"
+    ]
+    result = subprocess.run(check_cmd, capture_output=True, text=True)
+    
+    # Parse ACLs from output
+    existing_acls = {}
+    current_resource = None
+    
+    for line in result.stdout.splitlines():
+        line = line.strip()
+    
+        # Match resource name from "Current ACLs for resource" line
+        match = re.search(r'name=([^,]+), patternType=', line)
+        if match:
+            current_resource = match.group(1)
+    
+        # If we have an ACL entry, associate it with the correct resource
+        if current_resource and "principal=" in line:
+            if current_resource not in existing_acls:
+                existing_acls[current_resource] = set()
+            existing_acls[current_resource].add(line)
+    
+    # Process ACLs from YAML
+    for acl in config.get("kafka-acls", []):
+        action = acl.get("action")
+        principal = acl.get("allow-principal")
+        resource_pattern_type = acl.get("resource-pattern-type", "LITERAL")  # Default to LITERAL
+        operations = acl.get("operations", [])
+    
+        # Determine resource type and name
+        if "topic" in acl:
+            resource_type = "--topic"
+            resource_name = acl["topic"]
+        elif "group" in acl:
+            resource_type = "--group"
+            resource_name = acl["group"]
+        else:
+            print("Error: ACL must specify either a topic or a group.") # The script ONLY supports topic and group
+            continue
+    
+        for operation in operations:
+            acl_string = f"(principal={principal}, host=*, operation={operation}, permissionType=ALLOW)"
+    
+            if resource_name in existing_acls and any(acl_string in acl for acl in existing_acls[resource_name]):
+                print(f"ACL for {operation} on {resource_type} {resource_name} already exists. Skipping.")
+            else:
+                print(f"Creating ACL for {operation} on {resource_type} {resource_name}.")
+                create_cmd = [
+                    "kafka-acls", "--command-config", "/tmp/admin.properties", "--bootstrap-server", KAFKA_BROKER,
+                    action, "--allow-principal", principal,
+                    "--operation", operation,
+                    resource_type, resource_name,
+                    "--resource-pattern-type", resource_pattern_type
+                ]
+                subprocess.run(create_cmd)

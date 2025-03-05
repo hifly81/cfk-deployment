@@ -7,32 +7,19 @@ metadata:
     app: kafka-acl
 data:
   acl-config.yaml: |
-    acls:
-      - name: "Team1 Access2"
-        action: --add
-        allow_principal: User:alice
+    kafka-acls:
+      - action: "--add"
+        allow-principal: "User:team1"
         operations:
-          - WRITE
-          - READ
-        resource_pattern_type: literal
-        topics:
-          - team1-topic1
-          - team1-topic2
-
-      - name: "Team2 Access"
-        action: --add
-        allow_principal: User:bob
+          - "READ"
+          - "DESCRIBE"
+        topic: "mytopic"
+        resource-pattern-type: "literal"
+      
+      - action: "--add"
+        allow-principal: "User:team1"
         operations:
-          - DESCRIBE
-        resource_pattern_type: prefixed
-        topics:
-          - team2-*
-
-      - name: "Admin Access"
-        action: --add
-        allow_principal: User:admin
-        operations:
-          - ALL
-        resource_pattern_type: literal
-        topics:
-          - admin-topic
+          - "READ"
+          - "DESCRIBE"
+        topic: "mytopic"
+        resource-pattern-type: "literal"
