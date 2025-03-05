@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: kafka-admin-secret
+  name: acl-admin-secret
   namespace: confluent
   labels:
     app: kafka-acl

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: kafka-acl-script
+  name: acl-kafka-script
   namespace: confluent
   labels:
     app: kafka-acl

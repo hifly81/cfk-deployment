@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: kafka-acl-job
+  name: acl-kafka-job
   namespace: confluent
   labels:
     app: kafka-acl
@@ -36,11 +36,11 @@ spec:
       volumes:
         - name: acl-script
           configMap:
-            name: kafka-acl-script
+            name: acl-kafka-script
             defaultMode: 0755
         - name: acl-config
           configMap:
-            name: kafka-acl-config
+            name: acl-kafka-config
         - name: kafka-admin-config
           secret:
-            secretName: kafka-admin-secret
+            secretName: acl-admin-secret
