@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: acl-kafka-script
+  name: kafka-acl-script
   namespace: confluent
   labels:
     app: kafka-acl
@@ -17,9 +17,10 @@ data:
     # Parse YAML and process each ACL block
     while IFS= read -r line; do
       case "$line" in
-        "  - name:"*)
+        "  - name:"*)  # Detect ACL block start
           if [[ -n "$NAME" ]]; then
-            # Apply ACL for previous block
+            # Apply ACL for the previous block
+            echo "Processing ACL: $NAME"
             for topic in "${TOPICS[@]}"; do
               CMD="kafka-acls --bootstrap-server $BROKER --command-config /tmp/admin.properties $ACTION --allow-principal $ALLOW_PRINCIPAL"
     
@@ -27,16 +28,16 @@ data:
               for op in "${OPERATIONS[@]}"; do
                 CMD+=" --operation $op"
               done
-
+    
               # Add topic and resource pattern type
               CMD+=" --topic $topic"
               CMD+=" --resource-pattern-type $RESOURCE_PATTERN_TYPE"
-
+    
               # Add transactional ID if present
               if [[ -n "$TRANSACTIONAL_ID" ]]; then
                 CMD+=" --transactional-id $TRANSACTIONAL_ID"
               fi
-
+    
               echo "Executing: $CMD"
               eval "$CMD"
             done
@@ -50,16 +51,16 @@ data:
           OPERATIONS=()
           TOPICS=()
           ;;
-        "    action:"*)
+        "    action:"*)  # Extract action
           ACTION=$(echo "$line" | sed -E 's/.*action: *//')
           ;;
-        "    allow_principal:"*)
+        "    allow_principal:"*)  # Extract allow_principal
           ALLOW_PRINCIPAL=$(echo "$line" | sed -E 's/.*allow_principal: *//')
           ;;
-        "    transactional_id:"*)
+        "    transactional_id:"*)  # Extract transactional_id
           TRANSACTIONAL_ID=$(echo "$line" | sed -E 's/.*transactional_id: *//')
           ;;
-        "    resource_pattern_type:"*)
+        "    resource_pattern_type:"*)  # Extract resource_pattern_type
           RESOURCE_PATTERN_TYPE=$(echo "$line" | sed -E 's/.*resource_pattern_type: *//')
           ;;
         "      - "*)
@@ -75,19 +76,20 @@ data:
             esac
           fi
           ;;
-        "    operations:"*)
+        "    operations:"*)  # Operations block start
           lastKey="operations"
           ;;
-        "    topics:"*)
+        "    topics:"*)  # Topics block start
           lastKey="topics"
           ;;
       esac
     done < "$ACL_FILE"
 
-    # Process the last ACL block
+    # Process the last ACL block after finishing the loop (this part is crucial for a single ACL)
     if [[ -n "$NAME" ]]; then
+      echo "Processing final ACL: $NAME"
       for topic in "${TOPICS[@]}"; do
-        CMD="/opt/kafka/bin/kafka-acls.sh --bootstrap-server $BROKER --command-config /tmp/admin.properties $ACTION --allow-principal $ALLOW_PRINCIPAL"
+        CMD="kafka-acls --bootstrap-server $BROKER --command-config /tmp/admin.properties $ACTION --allow-principal $ALLOW_PRINCIPAL"
 
         for op in "${OPERATIONS[@]}"; do
           CMD+=" --operation $op"

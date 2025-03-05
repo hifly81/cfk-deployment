@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: acl-kafka-job
+  name: kafka-acl-job
   namespace: confluent
   labels:
     app: kafka-acl
@@ -24,10 +24,10 @@ spec:
                   name: kafka-config
                   key: broker-address
           volumeMounts:
-            - name: acl-script
+            - name: kafka-acl-script
               mountPath: /tmp/acl-setup.sh
               subPath: acl-setup.sh
-            - name: acl-config
+            - name: kafka-acl-config
               mountPath: /tmp/acl-config.yaml
               subPath: acl-config.yaml
             - name: kafka-admin-config
@@ -36,11 +36,11 @@ spec:
       volumes:
         - name: acl-script
           configMap:
-            name: acl-kafka-script
+            name: kafka-acl-script
             defaultMode: 0755
         - name: acl-config
           configMap:
-            name: acl-kafka-config
+            name: kafka-acl-config
         - name: kafka-admin-config
           secret:
-            secretName: acl-admin-secret
+            secretName: kafka-admin-secret
