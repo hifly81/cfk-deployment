@@ -116,7 +116,11 @@ argocd app create cp-platform-app \
 --sync-policy manual
 ```
 
-### Apply changes on resources using ArgoCD
+### Apply changes on Confluent Resources using ArgoCD
+
+At the moment, these are the resources that can be managed:
+ - Kafka Topics
+ - Kafka Standard ACLs on Kraft
 
 Obtain Password to login to ArgoCD:
 
