@@ -39,7 +39,7 @@ data:
               fi
     
               echo "Executing: $CMD"
-              eval "$CMD"
+              eval "$CMD"  # Execute the command
             done
           fi
           # Reset variables for new block
@@ -103,6 +103,6 @@ data:
         fi
 
         echo "Executing: $CMD"
-        eval "$CMD"
+        eval "$CMD"  # Execute the command
       done
     fi
