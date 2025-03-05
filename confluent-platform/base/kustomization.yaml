@@ -8,3 +8,4 @@ resources:
 - kafka-tls.yaml
 - kraftcontroller.yaml
 - kafka.yaml
+- schemaregistry.yaml
