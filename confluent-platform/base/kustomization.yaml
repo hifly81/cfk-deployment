@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
 - credential.yaml
+- credential-jaas.yaml
 - kafka-credential-tls.yaml
 - kafka-tls.yaml
 - kraftcontroller.yaml
