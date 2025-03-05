@@ -8,11 +8,4 @@ spec:
   partitionCount: 3
   configs:
     cleanup.policy: "delete"
-  kafkaClusterRef:
-    name: kafka
-  kafkaRest:
-    authentication:
-      type: bearer
-      bearer:
-        secretRef: rest-credential
 
