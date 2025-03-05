@@ -6,3 +6,4 @@ resources:
 - acl-config.yaml
 - acl-script.yaml
 - admin-prop.yaml
+- acl-job.yaml
