@@ -31,7 +31,7 @@ spec:
           secretRef: credential-jaas
   configOverrides:
     server:
-      - kafka.rest.enable=true
+      - confluent.http.server.listeners=http://0.0.0.0:8090
       - auto.create.topics.enable=true
       - default.replication.factor=3
       - min.insync.replicas=2
@@ -39,6 +39,7 @@ spec:
       - log.retention.hours=48
       - confluent.cluster.link.enable=false
       - confluent.telemetry.enabled=false
+      - confluent.balancer.enable=false
       - authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
       - super.users=User:kafka;User:kraft;User:kraftcontroller;User:operator
     log4j:
