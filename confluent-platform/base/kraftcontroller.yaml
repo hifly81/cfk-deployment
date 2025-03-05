@@ -4,6 +4,8 @@ metadata:
   name: kraftcontroller
   namespace: confluent
 spec:
+  license:
+    secretRef: confluent-license
   dataVolumeCapacity: 1G
   image:
     application: docker.io/confluentinc/cp-server:7.7.2

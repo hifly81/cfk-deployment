@@ -4,6 +4,8 @@ metadata:
   name: kafka
   namespace: confluent
 spec:
+  license:
+    secretRef: confluent-license
   dependencies:
     kRaftController:
       controllerListener:
@@ -42,8 +44,8 @@ spec:
       type: simple
       superUsers:
         - User:kafka
-        - User:controlcenter
         - User:kraft
+        - User:operator
   tls:
     secretRef: kafka-tls
     jksPassword:
