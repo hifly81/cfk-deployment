@@ -1,15 +1,15 @@
 apiVersion: platform.confluent.io/v1beta1
 kind: KRaftController
 metadata:
-  name: kcontroller
+  name: kraftcontroller
   namespace: confluent
 spec:
-  replicas: 1
-  license:
-    globalLicense: true
+  podTemplate:
+    serviceAccountName: confluent-sa
+  dataVolumeCapacity: 1G
   image:
-    application: confluentinc/cp-server:7.7.1
-    init: confluentinc/confluent-init-container:2.9.3
+    application: docker.io/confluentinc/cp-server:7.7.2
+    init: confluentinc/confluent-init-container:2.9.4
   listeners:
     controller:
       tls:
@@ -17,17 +17,9 @@ spec:
       authentication:
         type: plain
         jaasConfig:
-          secretRef: kraft-credentials
-  dataVolumeCapacity: 20Gi
-  podTemplate:
-    resources:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-    podSecurityContext:
-      fsGroup: 1000
-      runAsUser: 1000
-      runAsNonRoot: true
+          secretRef: credential
   tls:
-    secretRef: tls-group
-    #secretRef: tls-group
+    secretRef: kafka-tls
+    jksPassword:
+      secretRef: kafka-credential-tls
+  replicas: 3

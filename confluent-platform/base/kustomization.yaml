@@ -4,5 +4,4 @@ kind: Kustomization
 resources:
 - kraftcontroller.yaml
 - kafka.yaml
-- schemaregistry.yaml
-- controlcenter.yaml
+- kafkarestclass.yaml

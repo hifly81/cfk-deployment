@@ -8,7 +8,7 @@ You need _docker desktop_ installed on your host to run the quickstart: https://
 
 #### Minikube
 
-You also _Minikube_ on your host. 
+You need _Minikube_ on your host. 
 
 If you are on Linux follow instructions for ArchLinux (also tested with Fedora):
 https://dev.to/xs/kubernetes-minikube-with-qemu-kvm-on-arch-312a
@@ -113,7 +113,7 @@ argocd app create cp-platform-app \
 --path confluent-platform/environments/dev \
 --dest-server https://kubernetes.default.svc \
 --dest-namespace confluent \
---sync-policy automated
+--sync-policy manual
 ```
 
 ### Apply changes on resources using ArgoCD
@@ -138,7 +138,7 @@ $ argocd app create configuration-app \
 --path configuration/environments/dev \
 --dest-server https://kubernetes.default.svc \
 --dest-namespace confluent \
---sync-policy automated
+--sync-policy manual
 ```
 
 ### Teardown
