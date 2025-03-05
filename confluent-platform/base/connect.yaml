@@ -1,5 +1,5 @@
 apiVersion: platform.confluent.io/v1beta1
-kind: SchemaRegistry
+kind: Connect
 metadata:
   name: connect
   namespace: confluent
