@@ -29,7 +29,6 @@ spec:
           secretRef: credential-jaas
   configOverrides:
     server:
-      - password.encoder.secret=secret1
       - auto.create.topics.enable=true
       - default.replication.factor=3
       - min.insync.replicas=2
@@ -38,7 +37,6 @@ spec:
       - authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
     log4j:
       - log4j.logger.kafka.server.link=INFO, stdout
-      - log4j.additivity.kafka.server.link=false
     authorization:
       type: simple
       superUsers:
