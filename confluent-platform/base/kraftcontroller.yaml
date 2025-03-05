@@ -28,14 +28,9 @@ spec:
       - confluent.cluster.link.enable=false
       - confluent.telemetry.enabled=false
       - authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      - super.users=User:kafka;User:kraft;User:kraftcontroller;User:operator
     log4j:
       - log4j.logger.kafka.server.link=INFO, stdout
-  authorization:
-    type: simple
-    superUsers:
-      - User:kafka
-      - User:kraft
-      - User:kraftcontroller
   tls:
     secretRef: kafka-tls
     jksPassword:
