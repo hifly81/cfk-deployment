@@ -24,7 +24,7 @@ https://minikube.sigs.k8s.io/docs/start/
 Install _argocd_ cli: 
 
 ```
-$ brew install argocd
+brew install argocd
 ```
 
 #### kubectl CLI
@@ -32,7 +32,7 @@ $ brew install argocd
 Install _kubectl_:
 
 ```
-$ brew install kubectl
+brew install kubectl
 ```
 
 #### helm
@@ -40,8 +40,8 @@ $ brew install kubectl
 Install _helm_:
 
 ```
-$ brew install kubernetes-helm
-$ helm init
+brew install kubernetes-helm
+helm init
 ```
 
 
@@ -50,11 +50,11 @@ $ helm init
 Set _docker_ driver and reserve 16GB RAM and 4 CPUs to Minikube:
 
 ```
-$ minikube delete
-$ minikube config set driver docker
+minikube delete
+minikube config set driver docker
 
-$ touch /tmp/config && export KUBECONFIG=/tmp/config
-$ minikube start --memory 16384 --cpus 4
+touch /tmp/config && export KUBECONFIG=/tmp/config
+minikube start --memory 16384 --cpus 4
 ```
 
 ### Install ArgoCD Server in Minikube
@@ -62,14 +62,14 @@ $ minikube start --memory 16384 --cpus 4
 Install ArgoCD on _argocd_ namespace and expose it on port 8080:
 
 ```
-$ kubectl create namespace argocd
-$ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 ```
 
 When state is _Running_, expose on port 8080:
 
 ```
-$ kubectl port-forward svc/argocd-server -n argocd 8080:443
+kubectl port-forward svc/argocd-server -n argocd 8080:443
 ```
 
 ### Install CFK in Minikube
@@ -77,21 +77,21 @@ $ kubectl port-forward svc/argocd-server -n argocd 8080:443
 Create a namespace named _confluent_:
 
 ```
-$ kubectl create namespace confluent
-$ kubectl config set-context --current --namespace confluent
+kubectl create namespace confluent
+kubectl config set-context --current --namespace confluent
 ```
 
 Add confluent repository to _helm_:
 
 ```
-$ helm repo add confluentinc https://packages.confluent.io/helm
-$ helm repo update
+helm repo add confluentinc https://packages.confluent.io/helm
+helm repo update
 ```
 
 Install _confluent-for-kubernetes_ operator (latest version) from Confluent’s Helm repo:
 
 ```
-$ helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes --set kRaftEnabled=true
+helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes --set kRaftEnabled=true
 ```
 
 ### Deploy CP Platform using ArgoCD
@@ -99,13 +99,21 @@ $ helm upgrade --install confluent-operator confluentinc/confluent-for-kubernete
 Obtain Password to login to ArgoCD:
 
 ```
-$ kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 
 Login to ArgoCD:
 
 ```
 argocd login localhost:8080 --username admin --password <your-password>
+```
+
+Create secret with confluent license:
+
+```
+kubectl create secret generic confluent-license \
+--from-file=license.txt=./license.txt \
+--namespace confluent
 ```
 
 Deploy cp-platform-app on _confluent_ namespace for _dev_ environment:
@@ -128,19 +136,19 @@ At the moment, these are the resources that can be managed:
 Obtain Password to login to ArgoCD:
 
 ```
-$ kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 
 Login to ArgoCD:
 
 ```
-$ argocd login localhost:8080 --username admin --password <your-password>
+argocd login localhost:8080 --username admin --password <your-password>
 ```
 
 Apply configuration-app on _confluent_ namespace for _dev_ environment:
 
 ```
-$ argocd app create configuration-app \
+argocd app create configuration-app \
 --repo https://github.com/hifly81/cfk-deployment \
 --path configuration/environments/dev \
 --dest-server https://kubernetes.default.svc \
@@ -151,5 +159,5 @@ $ argocd app create configuration-app \
 ### Teardown
 
 ```
-$ minikube delete
+minikube delete
 ```

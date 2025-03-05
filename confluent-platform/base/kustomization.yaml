@@ -6,6 +6,7 @@ resources:
 - credential-jaas.yaml
 - kafka-credential-tls.yaml
 - kafka-tls.yaml
+- rest-credential.yaml
 - kraftcontroller.yaml
 - kafka.yaml
 - schemaregistry.yaml
