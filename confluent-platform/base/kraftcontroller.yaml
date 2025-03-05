@@ -26,6 +26,7 @@ spec:
       - num.partitions=3
       - log.retention.hours=48
       - confluent.cluster.link.enable=false
+      - confluent.telemetry.enabled=false
       - authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
     log4j:
       - log4j.logger.kafka.server.link=INFO, stdout
