@@ -18,6 +18,23 @@ spec:
         type: plain
         jaasConfig:
           secretRef: credential
+  configOverrides:
+    server:
+      - auto.create.topics.enable=true
+      - default.replication.factor=3
+      - min.insync.replicas=2
+      - num.partitions=3
+      - log.retention.hours=48
+      - confluent.cluster.link.enable=false
+      - authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+    log4j:
+      - log4j.logger.kafka.server.link=INFO, stdout
+  authorization:
+    type: simple
+    superUsers:
+      - User:kafka
+      - User:kraft
+      - User:operator
   tls:
     secretRef: kafka-tls
     jksPassword:
