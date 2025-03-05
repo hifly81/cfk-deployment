@@ -4,8 +4,6 @@ metadata:
   name: kraftcontroller
   namespace: confluent
 spec:
-  podTemplate:
-    serviceAccountName: confluent-sa
   dataVolumeCapacity: 1G
   image:
     application: docker.io/confluentinc/cp-server:7.7.2
