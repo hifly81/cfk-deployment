@@ -25,8 +25,8 @@ spec:
         enabled: true
       authentication:
         type: plain
-        jaasConfigPassThrough:
-          secretRef: credential
+        jaasConfig:
+          secretRef: credential-jaas
   configOverrides:
     server:
       - password.encoder.secret=secret1
