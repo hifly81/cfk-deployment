@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-acl-config
+  namespace: confluent
+  labels:
+    app: kafka-acl
+data:
+  acl-config.yaml: |
+    acls:
+      - name: "Team1 Access"
+        action: --add
+        allow_principal: User:alice
+        operations:
+          - WRITE
+          - READ
+        transactional_id: team1-streams-app1
+        resource_pattern_type: literal
+        topics:
+          - team1-topic1
+          - team1-topic2
+
+      - name: "Team2 Access"
+        action: --add
+        allow_principal: User:bob
+        operations:
+          - DESCRIBE
+        resource_pattern_type: prefixed
+        topics:
+          - team2-*
+
+      - name: "Admin Access"
+        action: --add
+        allow_principal: User:admin
+        operations:
+          - ALL
+        resource_pattern_type: literal
+        topics:
+          - admin-topic
