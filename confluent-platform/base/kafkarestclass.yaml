@@ -1,0 +1,16 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: KafkaRestClass
+metadata:
+  name: default
+  namespace: confluent
+spec:
+  kafkaRest:
+    kafkaClusterRef:
+      name: kafka
+    kafkaRest:
+      authentication:
+        type: bearer
+        bearer:
+          secretRef: rest-credential
+      tls:
+        enabled: true
