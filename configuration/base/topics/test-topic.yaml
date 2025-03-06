@@ -7,9 +7,6 @@ spec:
   kafkaClusterRef:
     name: kafka
     namespace: confluent
-  kafkaRest:
-    tls:
-      enabled: true
   replicas: 3
   partitionCount: 3
   configs:

@@ -9,7 +9,6 @@ resources:
 - rest-credential.yaml
 - kraftcontroller.yaml
 - kafka.yaml
-- kafkarestclass.yaml
 - schemaregistry.yaml
 - connect.yaml
 - restproxy.yaml

@@ -29,10 +29,6 @@ spec:
         type: plain
         jaasConfig:
           secretRef: credential-jaas
-  services:
-    kafkaRest:
-      tls:
-        enabled: true
   configOverrides:
     server:
       - auto.create.topics.enable=true
