@@ -41,6 +41,7 @@ spec:
       - confluent.balancer.enable=false
       - authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
       - super.users=User:kafka;User:kraft;User:kraftcontroller;User:operator
+      - confluent.http.server.listeners=http://0.0.0.0:8090
     log4j:
       - log4j.logger.kafka.server.link=INFO, stdout
   tls:
