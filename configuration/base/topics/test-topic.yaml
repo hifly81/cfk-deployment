@@ -10,7 +10,7 @@ spec:
     authentication:
       type: basic
       basic:
-        secretRef: credential
+        secretRef: topic-credential
     tls:
       enabled: true
   replicas: 3
