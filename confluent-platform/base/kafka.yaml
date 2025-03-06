@@ -31,10 +31,6 @@ spec:
           secretRef: credential-jaas
   services:
     kafkaRest:
-      authentication:
-        type: basic
-        basic:
-          secretRef: rest-credential
       tls:
         enabled: true
   configOverrides:

@@ -7,9 +7,5 @@ spec:
   kafkaClusterRef:
     name: kafka
   kafkaRest:
-    authentication:
-      type: basic
-      basic:
-        secretRef: topic-credential
     tls:
       enabled: true
