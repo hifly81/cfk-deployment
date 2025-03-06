@@ -10,8 +10,7 @@ spec:
     authentication:
       type: basic
       basic:
-        secretRef: rest-credential
-        file: bearer.txt
+        secretRef: credential
     tls:
       enabled: true
   replicas: 3
