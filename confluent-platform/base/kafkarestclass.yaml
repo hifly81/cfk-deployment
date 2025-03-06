@@ -10,6 +10,6 @@ spec:
     authentication:
       type: basic
       basic:
-        secretRef: rest-credential
+        secretRef: topic-credential
     tls:
       enabled: true
