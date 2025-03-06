@@ -4,6 +4,8 @@ metadata:
   name: test-topic
   namespace: confluent
 spec:
+  kafkaClusterRef:
+    name: kafka
   kafkaRest:
     authentication:
       type: bearer
