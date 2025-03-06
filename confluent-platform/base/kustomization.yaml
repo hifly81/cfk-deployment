@@ -7,7 +7,6 @@ resources:
 - kafka-credential-tls.yaml
 - kafka-tls.yaml
 - rest-credential.yaml
-- topic-credential.yaml
 - kraftcontroller.yaml
 - kafka.yaml
 - kafkarestclass.yaml
