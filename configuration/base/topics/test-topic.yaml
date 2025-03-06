@@ -4,9 +4,8 @@ metadata:
   name: test-topic
   namespace: confluent
 spec:
-  kafkaClusterRef:
-    name: kafka
   kafkaRest:
+    endpoint: https://kafka.confluent.svc.cluster.local:8090
     tls:
       enabled: true
   replicas: 3
