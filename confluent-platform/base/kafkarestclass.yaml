@@ -9,9 +9,8 @@ spec:
       name: kafka
     kafkaRest:
       authentication:
-        type: basic
-        basic:
+        type: bearer
+        bearer:
           secretRef: rest-credential
-          file: basic.txt
       tls:
         enabled: true

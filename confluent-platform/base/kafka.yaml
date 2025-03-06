@@ -32,10 +32,8 @@ spec:
   services:
     kafkaRest:
       authentication:
-        type: basic
-        basic:
-          roles:
-            - Administrators
+        type: bearer
+        bearer:
           secretRef: rest-credential
       tls:
         enabled: true
