@@ -13,13 +13,12 @@ data:
         operations:
           - "READ"
           - "DESCRIBE"
-        topic: "mytopic"
+        topic: "test-topic"
         resource-pattern-type: "literal"
       
       - action: "--add"
         allow-principal: "User:team1"
         operations:
-          - "READ"
-          - "DESCRIBE"
-        topic: "mytopic"
+          - "WRITE"
+        topic: "test-topic"
         resource-pattern-type: "literal"
