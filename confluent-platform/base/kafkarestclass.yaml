@@ -4,13 +4,12 @@ metadata:
   name: default
   namespace: confluent
 spec:
+  kafkaClusterRef:
+    name: kafka
   kafkaRest:
-    kafkaClusterRef:
-      name: kafka
-    kafkaRest:
-      authentication:
-        type: basic
-        basic:
-          secretRef: rest-credential
-      tls:
-        enabled: true
+    authentication:
+      type: basic
+      basic:
+        secretRef: rest-credential
+    tls:
+      enabled: true
