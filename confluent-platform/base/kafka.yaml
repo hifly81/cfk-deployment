@@ -39,9 +39,6 @@ spec:
           secretRef: rest-credential
       tls:
         enabled: true
-        secretRef: kafka-tls
-        jksPassword:
-          secretRef: kafka-credential-tls
   configOverrides:
     server:
       - auto.create.topics.enable=true
