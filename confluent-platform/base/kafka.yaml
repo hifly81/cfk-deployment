@@ -29,6 +29,19 @@ spec:
         type: plain
         jaasConfig:
           secretRef: credential-jaas
+  services:
+    kafkaRest:
+      authentication:
+        type: basic
+        basic:
+          roles:
+            - Administrators
+          secretRef: rest-credential
+      tls:
+        enabled: true
+        secretRef: kafka-tls
+        jksPassword:
+          secretRef: kafka-credential-tls
   configOverrides:
     server:
       - auto.create.topics.enable=true
@@ -48,15 +61,3 @@ spec:
     jksPassword:
       secretRef: kafka-credential-tls
   replicas: 3
----
-apiVersion: platform.confluent.io/v1beta1
-kind: KafkaRestClass
-metadata:
-  name: default
-  namespace: confluent
-spec:
-  kafkaRest:
-    authentication:
-      type: bearer
-      bearer:
-        secretRef: rest-credential
