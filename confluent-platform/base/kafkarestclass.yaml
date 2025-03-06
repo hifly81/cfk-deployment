@@ -11,8 +11,7 @@ spec:
       authentication:
         type: basic
         basic:
-          roles:
-            - Administrators
           secretRef: rest-credential
+          file: basic.txt
       tls:
         enabled: true
